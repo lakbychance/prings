@@ -311,7 +311,7 @@ const Home: NextPage = () => {
         <h1 className="text-gray-300 bg-gray-900 bg-opacity-60 text-center text-3xl py-2 mt-2 w-11/12 mx-auto rounded-2xl relative container max-w-md">Prings</h1>
       </header>
       <main
-        className="min-h-screen py-8 px-10 bg-gray-800"
+        className="min-h-screen py-6 px-10 bg-gray-800"
       >
         <section className="relative container flex max-w-md mx-auto flex-col items-center justify-center">
           <img
