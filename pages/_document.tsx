@@ -4,7 +4,6 @@ const Document = () => {
     return (
         <Html>
             <Head>
-                <title>Prings</title>
                 <link
                     rel="apple-touch-icon"
                     sizes="180x180"
@@ -23,6 +22,9 @@ const Document = () => {
                     href="/favicon-16x16.png"
                 />
                 <link rel="manifest" href="/manifest.json" />
+
+                <title>Prings</title>
+
                 <meta charSet="utf-8" />
                 <meta name="msapplication-config" content="/browserconfig.xml" />
                 <meta name="msapplication-TileColor" content="	#00800" />
