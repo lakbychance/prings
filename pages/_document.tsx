@@ -33,7 +33,6 @@ const Document = () => {
                 <meta name="title" content="Prings" />
                 <meta name="description" content="Add LinkedIn style profile rings to your images" />
 
-                {/*<!-- Open Graph / Facebook -->*/}
                 <meta property="og:title" content="Prings" />
                 <meta
                     property="og:description"
@@ -46,7 +45,6 @@ const Document = () => {
                     content="https://ik.imagekit.io/lapstjup/prings/prings_og_image.png"
                 />
 
-                {/* <!-- Twitter -->*/}
                 <meta property="twitter:card" content="summary_large_image" />
                 <meta property="twitter:url" content="https://www.prings.vercel.app" />
                 <meta property="twitter:title" content="Prings" />
