@@ -50,7 +50,7 @@ const Document = () => {
                     property="og:description"
                     content="Add LinkedIn style profile rings to your images"
                 />
-                <meta property="og:url" content="https://www.prings.vercel.app" />
+                <meta property="og:url" content="https://prings.vercel.app" />
                 <meta property="og:type" content="website" />
                 <meta
                     property="og:image"
@@ -59,7 +59,7 @@ const Document = () => {
 
                 {/* <!-- Twitter -->*/}
                 <meta property="twitter:card" content="summary_large_image" />
-                <meta property="twitter:url" content="https://www.prings.vercel.app" />
+                <meta property="twitter:url" content="https://prings.vercel.app" />
                 <meta property="twitter:title" content="Prings" />
                 <meta
                     property="twitter:description"
