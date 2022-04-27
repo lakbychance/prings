@@ -315,12 +315,12 @@ const Home: NextPage = () => {
         className="min-h-screen py-6 px-10 bg-gray-800"
       >
         <section className="relative container flex max-w-md mx-auto flex-col items-center justify-center">
+
           <img
             ref={profilePicRef}
             src={profilePicUrl}
-            width={350}
-            height={350}
-            className="rounded-full aspect-square object-cover"
+            className="rounded-full aspect-square w-80 h-80 object-cover"
+            style={{ minWidth: '20rem' }}
           />
 
           <svg
