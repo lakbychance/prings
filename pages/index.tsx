@@ -493,7 +493,7 @@ const Home: NextPage = () => {
           >
             {!isDownloading ? 'Download' : '◉  ◉  ◉'}
           </button>
-          <a hidden ref={downloadLinkRef} />
+          <a hidden target='_blank' ref={downloadLinkRef} />
         </section>
         <canvas hidden ref={canvasRef} />
       </main>

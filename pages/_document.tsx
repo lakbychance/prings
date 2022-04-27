@@ -5,7 +5,7 @@ const Document = () => {
         <Html>
             <Head>
                 {/* Global site tag (gtag.js) - Google Analytic */}
-                {/* <script
+                <script
                     async
                     src="https://www.googletagmanager.com/gtag/js?id=G-2VSQZMZCY6"
                 ></script>
@@ -15,7 +15,7 @@ const Document = () => {
                    {dataLayer.push(arguments)}
                    gtag('js', new Date()); gtag('config', 'G-2VSQZMZCY6');`,
                     }}
-                ></script> */}
+                ></script>
 
                 <link
                     rel="apple-touch-icon"
