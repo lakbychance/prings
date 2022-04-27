@@ -367,7 +367,7 @@ const Home: NextPage = () => {
                   lineHeight: "2.5rem",
                   fontWeight: "700",
                   fill: profileRingTextColor,
-                  letterSpacing: "0.15rem",
+                  letterSpacing: "2.4px",
                   fontFamily: "sans-serif",
                 }}
                 xlinkHref="#profileRingTextPath"
