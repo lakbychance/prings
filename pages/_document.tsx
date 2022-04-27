@@ -4,6 +4,19 @@ const Document = () => {
     return (
         <Html>
             <Head>
+                {/* Global site tag (gtag.js) - Google Analytic */}
+                <script
+                    async
+                    src="https://www.googletagmanager.com/gtag/js?id=G-2VSQZMZCY6"
+                ></script>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `window.dataLayer = window.dataLayer || []; function gtag()
+                   {dataLayer.push(arguments)}
+                   gtag('js', new Date()); gtag('config', 'G-2VSQZMZCY6');`,
+                    }}
+                ></script>
+
                 <link
                     rel="apple-touch-icon"
                     sizes="180x180"
