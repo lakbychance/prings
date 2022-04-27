@@ -5,7 +5,6 @@ import * as Popover from "@radix-ui/react-popover";
 import clsx from 'clsx'
 
 import { HexColorPicker } from "react-colorful";
-import Image from "next/image";
 
 function fit(contains: boolean) {
   return (
