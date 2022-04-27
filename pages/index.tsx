@@ -199,66 +199,68 @@ const Home: NextPage = () => {
   const onDownloadProfilePic = () => {
     downloadStatusDispatch({ type: 'PENDING' });
     const profileRingSVG = profileRingSVGRef.current;
-    let outerHTML = profileRingSVG?.outerHTML;
-    const base64 = `data:image/svg+xml;base64,${window.btoa(
-      outerHTML as string
-    )}`;
-    const image = new window.Image();
-    const profilePic = profilePicRef.current;
-    let minimumProfilePicSize = 800;
-    if (profilePic) {
-      minimumProfilePicSize = Math.min(profilePic.naturalHeight, profilePic.naturalWidth);
-      if (window.innerWidth <= 1024) {
-        minimumProfilePicSize = Math.min(minimumProfilePicSize, 800);
+    let profileRingSVGHTML = profileRingSVG?.outerHTML;
+    if (profileRingSVGHTML) {
+      const profileRingSVGBlob = new Blob([profileRingSVGHTML], { type: 'image/svg+xml' });
+      const profileRingSVGURL = URL.createObjectURL(profileRingSVGBlob);
+      const profileRingSVGImage = new window.Image();
+      const profilePic = profilePicRef.current;
+      let minimumProfilePicSize = 800;
+      if (profilePic) {
+        minimumProfilePicSize = Math.min(profilePic.naturalHeight, profilePic.naturalWidth);
+        if (window.innerWidth <= 1024) {
+          minimumProfilePicSize = Math.min(minimumProfilePicSize, 800);
+        }
       }
-    }
-    image.onload = () => {
-      const canvas = canvasRef.current;
-      if (canvas) {
-        canvas.width = minimumProfilePicSize * devicePixelRatio;
-        canvas.height = minimumProfilePicSize * devicePixelRatio;
-        canvas.style.width = `${profilePicDimensions.width}px`
-        canvas.style.height = `${profilePicDimensions.height}px`
+      profileRingSVGImage.addEventListener('load', () => {
+        URL.revokeObjectURL(profileRingSVGURL)
+        const canvas = canvasRef.current;
+        if (canvas) {
+          canvas.width = minimumProfilePicSize * devicePixelRatio;
+          canvas.height = minimumProfilePicSize * devicePixelRatio;
+          canvas.style.width = `${profilePicDimensions.width}px`
+          canvas.style.height = `${profilePicDimensions.height}px`
 
-        const { offsetX, offsetY, width, height } = cover(
-          minimumProfilePicSize,
-          minimumProfilePicSize,
-          Number(profilePic?.naturalWidth),
-          Number(profilePic?.naturalHeight)
-        );
-
-        let context = canvas.getContext("2d");
-        if (context) {
-          if (profilePic)
-            context.drawImage(
-              profilePic,
-              offsetX * devicePixelRatio,
-              offsetY * devicePixelRatio,
-              devicePixelRatio * width,
-              devicePixelRatio * height
-            );
-          context.drawImage(
-            image,
-            0,
-            0,
-            minimumProfilePicSize * devicePixelRatio,
-            minimumProfilePicSize * devicePixelRatio
+          const { offsetX, offsetY, width, height } = cover(
+            minimumProfilePicSize,
+            minimumProfilePicSize,
+            Number(profilePic?.naturalWidth),
+            Number(profilePic?.naturalHeight)
           );
-        };
-        var downloadLink = downloadLinkRef.current;
-        setTimeout(() => {
-          downloadLink?.setAttribute("download", `prings.png`);
-          downloadLink?.setAttribute(
-            "href",
-            canvas
-              .toDataURL("image/webp", 1)
-              .replace("image/webp", "image/octet-stream"));
-          downloadLink?.click();
-          downloadStatusDispatch({ type: 'RESOLVED' })
-        }, 100)
-      }
+
+          let context = canvas.getContext("2d");
+          if (context) {
+            if (profilePic)
+              context.drawImage(
+                profilePic,
+                offsetX * devicePixelRatio,
+                offsetY * devicePixelRatio,
+                devicePixelRatio * width,
+                devicePixelRatio * height
+              );
+            context.drawImage(
+              profileRingSVGImage,
+              0,
+              0,
+              minimumProfilePicSize * devicePixelRatio,
+              minimumProfilePicSize * devicePixelRatio
+            );
+          };
+          var downloadLink = downloadLinkRef.current;
+          setTimeout(() => {
+            downloadLink?.setAttribute("download", `prings.png`);
+            downloadLink?.setAttribute(
+              "href",
+              canvas
+                .toDataURL("image/webp", 1)
+                .replace("image/webp", "image/octet-stream"));
+            downloadLink?.click();
+            downloadStatusDispatch({ type: 'RESOLVED' })
+          }, 100)
+        }
+      }, { once: true })
+      profileRingSVGImage.src = profileRingSVGURL;
     }
-    image.src = base64;
   };
 
   const onChangeColors = (color: string) => {
