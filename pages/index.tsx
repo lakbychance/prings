@@ -206,10 +206,7 @@ const Home: NextPage = () => {
       const profilePic = profilePicRef.current;
       let minimumProfilePicSize = 800;
       if (profilePic) {
-        minimumProfilePicSize = Math.min(profilePic.naturalHeight, profilePic.naturalWidth);
-        if (window.innerWidth <= 1024) {
-          minimumProfilePicSize = Math.min(minimumProfilePicSize, 800);
-        }
+        minimumProfilePicSize = Math.min(profilePic.naturalHeight, profilePic.naturalWidth, minimumProfilePicSize);
       }
       profileRingSVGImage.addEventListener('load', () => {
         URL.revokeObjectURL(profileRingSVGURL)
