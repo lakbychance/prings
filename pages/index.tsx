@@ -303,7 +303,7 @@ const Home: NextPage = () => {
 
   const profilePicWidth = profilePicDimensions.width;
   const profilePicHeight = profilePicDimensions.height;
-  const profileRingOffset = profilePicWidth / 2 - 25;
+  const profileRingOffset = profilePicWidth / 2 - 27.5;
   const isDownloading = downloadStatusState.pending;
 
   return (
@@ -359,7 +359,7 @@ const Home: NextPage = () => {
               id="profileRingTextPath"
               fill="none"
               stroke="url(#profileRingGradient)"
-              strokeWidth="50"
+              strokeWidth="55"
             />
             <text dy="0.3em" fontSize="1em">
               <textPath
