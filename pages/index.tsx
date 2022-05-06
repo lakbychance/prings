@@ -387,56 +387,61 @@ const Home: NextPage = () => {
             onChange={onProfileRingTextChange}
           />
           <div className="flex justify-between my-2 w-full">
-            <div className="flex flex-wrap gap-1">
-              <label className="flex items-center bg-gray-700 px-2 sm:px-4 rounded-full">
-                {" "}
-                <span className="mx-1 text-sm text-green-300 font-semibold">Ring</span>{" "}
-                <input
-                  type="radio"
-                  name="profileRingColors"
-                  value="profileRingColor"
-                  checked={selectedColorOption.ring}
-                  onChange={() => selectedColorDispatch({ type: "RING" })}
-                />
-              </label>
-              <label className="flex items-center bg-gray-700 px-2 sm:px-4 rounded-full">
-                <span className="mx-1 text-sm text-green-300 font-semibold">Fade</span>
-                <input
-                  type="radio"
-                  name="profileRingColors"
-                  value="profileRingFadeColor"
-                  checked={selectedColorOption.fade}
-                  onChange={() => selectedColorDispatch({ type: "FADE" })}
-                />
-              </label>
-              <label className="flex items-center bg-gray-700 px-2 sm:px-4 rounded-full">
-                <span className="mx-1 text-sm text-green-300 font-semibold">Text</span>
-                <input
-                  type="radio"
-                  name="profileRingColors"
-                  value="profileRingTextColor"
-                  checked={selectedColorOption.text}
-                  onChange={() => selectedColorDispatch({ type: "TEXT" })}
-                />
-              </label>
+            <div className="w-full">
+              <p className="font-semibold text-gray-200 mb-1">Change color of</p>
+              <div className="flex justify-between">
+                <div className="flex flex-wrap gap-1">
+                  <label className="flex items-center bg-gray-700 px-2 sm:px-4 rounded-full">
+                    {" "}
+                    <span className="mx-1 text-sm text-green-300 font-semibold">Ring</span>{" "}
+                    <input
+                      type="radio"
+                      name="profileRingColors"
+                      value="profileRingColor"
+                      checked={selectedColorOption.ring}
+                      onChange={() => selectedColorDispatch({ type: "RING" })}
+                    />
+                  </label>
+                  <label className="flex items-center bg-gray-700 px-2 sm:px-4 rounded-full">
+                    <span className="mx-1 text-sm text-green-300 font-semibold">Fade</span>
+                    <input
+                      type="radio"
+                      name="profileRingColors"
+                      value="profileRingFadeColor"
+                      checked={selectedColorOption.fade}
+                      onChange={() => selectedColorDispatch({ type: "FADE" })}
+                    />
+                  </label>
+                  <label className="flex items-center bg-gray-700 px-2 sm:px-4 rounded-full">
+                    <span className="mx-1 text-sm text-green-300 font-semibold">Text</span>
+                    <input
+                      type="radio"
+                      name="profileRingColors"
+                      value="profileRingTextColor"
+                      checked={selectedColorOption.text}
+                      onChange={() => selectedColorDispatch({ type: "TEXT" })}
+                    />
+                  </label>
+                </div>
+                <Popover.Root>
+                  <Popover.Trigger className="p-4 rounded-lg border-white border-2" style={{
+                    backgroundColor: selectedColorOption.ring
+                      ? profileRingColor
+                      : selectedColorOption.fade
+                        ? profileRingFadeColor
+                        : profileRingTextColor,
+                  }}>
+                  </Popover.Trigger>
+                  <Popover.Content>
+                    <HexColorPicker
+                      color={profileRingFadeColor}
+                      onChange={onChangeColors}
+                    />
+                    ;
+                  </Popover.Content>
+                </Popover.Root>
+              </div>
             </div>
-            <Popover.Root>
-              <Popover.Trigger className="p-4 rounded-lg border-white border-2" style={{
-                backgroundColor: selectedColorOption.ring
-                  ? profileRingColor
-                  : selectedColorOption.fade
-                    ? profileRingFadeColor
-                    : profileRingTextColor,
-              }}>
-              </Popover.Trigger>
-              <Popover.Content>
-                <HexColorPicker
-                  color={profileRingFadeColor}
-                  onChange={onChangeColors}
-                />
-                ;
-              </Popover.Content>
-            </Popover.Root>
           </div>
           <div className="w-full mt-2">
             <label className="font-semibold text-gray-200">Change text size</label>
