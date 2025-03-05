@@ -34,20 +34,19 @@ export function ProfileRing({
 }: ProfileRingProps) {
     const profileRingOffset = profilePicWidth / 2 - 26.25;
 
-    React.useEffect(() => {
-        if (profilePicRef.current) {
-            onProfilePicLoad(profilePicRef.current);
-        }
-    }, [profilePicRef.current, onProfilePicLoad]);
-
     return (
         <div className="relative flex items-center justify-center">
             <img
                 ref={profilePicRef}
                 src={profilePicUrl}
                 className="rounded-full aspect-square w-80 h-80 object-cover"
-                style={{ minWidth: '20rem' }}
+                style={{ minWidth: '20rem', objectFit: 'cover' }}
                 alt="Profile"
+                onLoad={() => {
+                    if (profilePicRef.current) {
+                        onProfilePicLoad(profilePicRef.current);
+                    }
+                }}
             />
 
             <svg

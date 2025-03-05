@@ -6,6 +6,7 @@ import { Slider } from "../components/ui/slider";
 import { Label } from "../components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { ProfileRing } from "../components/ProfileRing";
+import ImageCropper from "../components/ImageCropper";
 import { cn } from "../lib/utils";
 
 function fit(contains: boolean) {
@@ -140,11 +141,14 @@ const downloadStatusReducer = (
 };
 
 const Home: NextPage = () => {
-  const [profilePicUrl, setProfilePicUrl] = useState("/defaultProfilePic.png");
+  const [profilePicUrl, setProfilePicUrl] = useState<string>("/defaultProfilePic.png");
   const [profilePicDimensions, setProfilePicDimensions] = useState({
     width: 0,
     height: 0,
   });
+  const [showCropper, setShowCropper] = useState<boolean>(false);
+  const [imageToEdit, setImageToEdit] = useState<string | null>(null);
+  const [isImageLoading, setIsImageLoading] = useState<boolean>(false);
 
   const [selectedColorOption, selectedColorDispatch] = useReducer(
     selectedColorOptionReducer,
@@ -186,13 +190,50 @@ const Home: NextPage = () => {
 
   const onProfilePicUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = e.target?.files?.[0];
+    if (!uploadedFile) return;
+
+    // Don't set loading state when initially selecting an image
     const fileReader = new FileReader();
     fileReader.onload = function (event) {
       const profilePicUrl = event.target?.result?.toString();
-      if (profilePicUrl) setProfilePicUrl(profilePicUrl);
+      if (profilePicUrl) {
+        setImageToEdit(profilePicUrl);
+        setShowCropper(true);
+      }
     };
 
-    if (uploadedFile) fileReader.readAsDataURL(uploadedFile);
+    fileReader.readAsDataURL(uploadedFile);
+  };
+
+  const handleCropComplete = async (croppedImage: string) => {
+    // Set loading state only when applying the cropped image
+    setIsImageLoading(true);
+    setProfilePicUrl(croppedImage);
+    setShowCropper(false);
+    setImageToEdit(null);
+
+    // Reset dimensions to trigger recalculation when the new image loads
+    setProfilePicDimensions({
+      width: 0,
+      height: 0,
+    });
+
+    // Small delay to ensure the UI updates
+    setTimeout(() => {
+      setIsImageLoading(false);
+    }, 300);
+  };
+
+  const handleCropCancel = () => {
+    setShowCropper(false);
+    setImageToEdit(null);
+    setIsImageLoading(false);
+
+    // Reset the file input
+    const fileInput = document.getElementById('profile-pic') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
   };
 
   const onProfileRingTextChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -318,40 +359,53 @@ const Home: NextPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-900">
+    <div className="min-h-screen bg-zinc-900 text-zinc-100">
       <main className="container sm:py-8 px-0 sm:px-4">
         <div className="skeuo-card mx-0 sm:mx-auto sm:max-w-md w-full">
 
           <div className="space-y-6">
             <div className="flex justify-center">
-              <ProfileRing
-                profilePicUrl={profilePicUrl}
-                profilePicWidth={profilePicWidth}
-                profilePicHeight={profilePicHeight}
-                profileRingText={profileRingText}
-                profileRingTextColor={profileRingTextColor}
-                profileRingTextFontSize={profileRingTextFontSize}
-                profileRingTextStartOffset={profileRingTextStartOffset}
-                profileRingColor={profileRingColor}
-                profileRingFadeColor={profileRingFadeColor}
-                profileRingFontFamily={profileRingFontFamily}
-                onProfilePicLoad={onProfilePicLoad}
-                profileRingSVGRef={profileRingSVGRef}
-                profilePicRef={profilePicRef}
-              />
+              <div className="relative">
+                {isImageLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-zinc-900 bg-opacity-50 rounded-full z-10">
+                    <div className="w-12 h-12 border-4 border-zinc-600 border-t-zinc-300 rounded-full animate-spin"></div>
+                  </div>
+                )}
+                <ProfileRing
+                  profilePicUrl={profilePicUrl}
+                  profilePicWidth={profilePicWidth}
+                  profilePicHeight={profilePicHeight}
+                  profileRingText={profileRingText}
+                  profileRingTextColor={profileRingTextColor}
+                  profileRingTextFontSize={profileRingTextFontSize}
+                  profileRingTextStartOffset={profileRingTextStartOffset}
+                  profileRingColor={profileRingColor}
+                  profileRingFadeColor={profileRingFadeColor}
+                  profileRingFontFamily={profileRingFontFamily}
+                  onProfilePicLoad={onProfilePicLoad}
+                  profileRingSVGRef={profileRingSVGRef}
+                  profilePicRef={profilePicRef}
+                />
+              </div>
             </div>
 
             <div className="space-y-4">
               <div>
                 <Label htmlFor="profile-pic" className="block mb-2 font-semibold text-zinc-200" style={{ textShadow: "0 1px 0 rgba(0, 0, 0, 0.8)" }}>Upload Profile Picture</Label>
                 <div className="p-0 overflow-hidden transition-all">
-                  <Input
-                    id="profile-pic"
-                    type="file"
-                    accept="image/*"
-                    onChange={onProfilePicUpload}
-                    className="p-0 cursor-pointer border-0 shadow-none bg-transparent text-zinc-200 focus-visible:outline-none focus-visible:ring-0"
-                  />
+                  <label className="skeuo-button py-2 px-4 inline-flex items-center justify-center cursor-pointer text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-900 w-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Choose Profile Picture
+                    <Input
+                      id="profile-pic"
+                      type="file"
+                      accept="image/*"
+                      onChange={onProfilePicUpload}
+                      className="hidden"
+                    />
+                  </label>
                 </div>
               </div>
 
@@ -544,6 +598,15 @@ const Home: NextPage = () => {
       </main>
       <a hidden target='_blank' ref={downloadLinkRef} />
       <canvas hidden ref={canvasRef} />
+
+      {imageToEdit && (
+        <ImageCropper
+          image={imageToEdit}
+          onCropComplete={handleCropComplete}
+          onCancel={handleCropCancel}
+          isOpen={showCropper}
+        />
+      )}
     </div>
   );
 };
