@@ -1,9 +1,276 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 355 100% 100%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 142 76% 36%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 142 70.6% 45.3%;
+    --primary-foreground: 144 80% 10%;
+    --secondary: 217 32% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 32% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 32% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
+    --ring: 142 70.6% 45.3%;
+  }
+}
+
+/* Skeuomorphic styles */
+@layer components {
+  .skeuo-card {
+    background-color: #18181b; /* zinc-900 */
+    border-radius: 12px;
+    padding: 20px;
+  }
+  
+  /* Media query for screens smaller than 640px */
+  @media (max-width: 639px) {
+    .skeuo-card {
+      border-radius: 0;
+      width: 100%;
+      max-width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+      border-left: none;
+      border-right: none;
+    }
+  }
+
+  .skeuo-button {
+    background: linear-gradient(to bottom, #3f3f46 0%, #27272a 100%); /* zinc-700 to zinc-800 */
+    border-radius: 6px;
+    border: 1px solid #18181b; /* zinc-900 */
+    box-shadow: 
+      0 1px 2px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(63, 63, 70, 0.8);
+    color: #e4e4e7; /* zinc-200 */
+    font-weight: 600;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+    transition: all 0.1s ease;
+  }
+
+  .skeuo-button:hover {
+    background: linear-gradient(to bottom, #52525b 0%, #3f3f46 100%); /* zinc-600 to zinc-700 */
+  }
+
+  .skeuo-button:active {
+    background: linear-gradient(to bottom, #27272a 0%, #3f3f46 100%); /* zinc-800 to zinc-700 */
+    box-shadow: 
+      inset 0 1px 3px rgba(0, 0, 0, 0.4),
+      0 1px 0 rgba(63, 63, 70, 0.5);
+    transform: translateY(1px);
+  }
+
+  .skeuo-button:focus-visible {
+    outline: none;
+    box-shadow: 
+      0 1px 2px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(63, 63, 70, 0.8),
+      0 0 0 2px rgba(161, 161, 170, 0.5); /* zinc-400 with opacity */
+  }
+
+  .skeuo-input {
+    background-color: #3f3f46; /* zinc-700 */
+    border: 1px solid #18181b; /* zinc-900 */
+    border-radius: 4px;
+    box-shadow: 
+      inset 0 1px 3px rgba(0, 0, 0, 0.3),
+      0 1px 0 rgba(63, 63, 70, 0.5);
+    padding: 8px 12px;
+    color: #e4e4e7; /* zinc-200 */
+  }
+  
+  .skeuo-input:focus-visible {
+    outline: none;
+    border-color: #a1a1aa; /* zinc-400 */
+    box-shadow: 
+      inset 0 1px 3px rgba(0, 0, 0, 0.3),
+      0 1px 0 rgba(63, 63, 70, 0.5),
+      0 0 0 2px rgba(161, 161, 170, 0.3); /* zinc-400 with opacity */
+  }
+  
+  select.skeuo-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23e4e4e7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+  }
+  
+  select.skeuo-input:focus-visible {
+    outline: none;
+    border-color: #a1a1aa; /* zinc-400 */
+    box-shadow: 
+      inset 0 1px 3px rgba(0, 0, 0, 0.3),
+      0 1px 0 rgba(63, 63, 70, 0.5),
+      0 0 0 2px rgba(161, 161, 170, 0.3); /* zinc-400 with opacity */
+  }
+  
+  select.skeuo-input option {
+    background-color: #3f3f46; /* zinc-700 */
+    color: #e4e4e7; /* zinc-200 */
+  }
+
+  .skeuo-slider-track {
+    height: 10px;
+    background: linear-gradient(to bottom, #27272a 0%, #3f3f46 100%); /* zinc-800 to zinc-700 */
+    border-radius: 5px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .skeuo-slider-range {
+    background: linear-gradient(to bottom, #4CAF50 0%, #3e8e41 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  .skeuo-slider-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(to bottom, #52525b 0%, #3f3f46 100%); /* zinc-600 to zinc-700 */
+    border: 1px solid #18181b; /* zinc-900 */
+    box-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(82, 82, 91, 0.8);
+    transition: box-shadow 0.15s ease;
+  }
+
+  .skeuo-slider-thumb:focus-visible {
+    outline: none;
+    box-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(82, 82, 91, 0.8),
+      0 0 0 3px rgba(161, 161, 170, 0.5); /* zinc-400 with opacity */
+  }
+
+  .skeuo-radio {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid #18181b; /* zinc-900 */
+    background: linear-gradient(to bottom, #52525b 0%, #3f3f46 100%); /* zinc-600 to zinc-700 */
+    box-shadow: 
+      inset 0 1px 0 rgba(63, 63, 70, 0.8),
+      0 1px 2px rgba(0, 0, 0, 0.2);
+    position: relative;
+  }
+
+  .skeuo-radio:checked::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: linear-gradient(to bottom, #4CAF50 0%, #3e8e41 100%);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  }
+
+  .skeuo-radio:focus-visible {
+    outline: none;
+    box-shadow: 
+      inset 0 1px 0 rgba(63, 63, 70, 0.8),
+      0 1px 2px rgba(0, 0, 0, 0.2),
+      0 0 0 2px rgba(161, 161, 170, 0.5); /* zinc-400 with opacity */
+  }
+
+  /* Color picker button focus styles */
+  button[data-focused="true"] {
+    outline: none;
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.2), 
+      0 1px 2px rgba(0, 0, 0, 0.3),
+      0 0 0 3px rgba(161, 161, 170, 0.5) !important; /* zinc-400 with opacity */
+  }
+
+  /* File input styles */
+  input[type="file"] {
+    position: relative;
+  }
+
+  input[type="file"]::file-selector-button {
+    background: linear-gradient(to bottom, #3f3f46 0%, #27272a 100%); /* zinc-700 to zinc-800 */
+    border: 1px solid #18181b; /* zinc-900 */
+    border-radius: 4px;
+    color: #e4e4e7; /* zinc-200 */
+    cursor: pointer;
+    font-weight: 500;
+    margin-right: 12px;
+    padding: 4px 12px;
+    transition: all 0.15s ease;
+    box-shadow: 
+      0 1px 2px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(63, 63, 70, 0.8);
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  input[type="file"]::file-selector-button:hover {
+    background: linear-gradient(to bottom, #52525b 0%, #3f3f46 100%); /* zinc-600 to zinc-700 */
+  }
+
+  input[type="file"]::file-selector-button:active {
+    background: linear-gradient(to bottom, #27272a 0%, #3f3f46 100%); /* zinc-800 to zinc-700 */
+    box-shadow: 
+      inset 0 1px 3px rgba(0, 0, 0, 0.4),
+      0 1px 0 rgba(63, 63, 70, 0.5);
+    transform: translateY(1px);
+  }
+
+  input[type="file"]:focus-visible::file-selector-button {
+    outline: none;
+    box-shadow: 
+      0 1px 2px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(63, 63, 70, 0.8),
+      0 0 0 2px rgba(161, 161, 170, 0.5); /* zinc-400 with opacity */
+  }
+}
+
 html,
 body {
   padding: 0;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  background-color: #18181b; /* zinc-900 */
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%2327272a' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
 }
 
 a {
@@ -14,7 +281,3 @@ a {
 * {
   box-sizing: border-box;
 }
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;

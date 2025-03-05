@@ -1,10 +1,12 @@
 import type { NextPage } from "next";
 import { ChangeEvent, useEffect, useReducer, useRef, useState } from "react";
-import * as Slider from "@radix-ui/react-slider";
-import * as Popover from "@radix-ui/react-popover";
-import clsx from 'clsx'
-
 import { HexColorPicker } from "react-colorful";
+import { Input } from "../components/ui/input";
+import { Slider } from "../components/ui/slider";
+import { Label } from "../components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
+import { ProfileRing } from "../components/ProfileRing";
+import { cn } from "../lib/utils";
 
 function fit(contains: boolean) {
   return (
@@ -45,6 +47,7 @@ interface ProfileRingState {
   profileRingTextStartOffset: number;
   profileRingColor: string;
   profileRingFadeColor: string;
+  profileRingFontFamily: string;
 }
 
 interface ProfileRingAction {
@@ -54,7 +57,8 @@ interface ProfileRingAction {
   | "CHANGE_PROFILE_RING_TEXT_FONT_SIZE"
   | "CHANGE_PROFILE_RING_TEXT_START_OFFSET"
   | "CHANGE_PROFILE_RING_COLOR"
-  | "CHANGE_PROFILE_RING_FADE_COLOR";
+  | "CHANGE_PROFILE_RING_FADE_COLOR"
+  | "CHANGE_PROFILE_RING_FONT_FAMILY";
   payload: any;
 }
 
@@ -62,8 +66,7 @@ const profileRingReducer = (
   state: ProfileRingState,
   action: ProfileRingAction
 ) => {
-  const type = action.type;
-  switch (type) {
+  switch (action.type) {
     case "CHANGE_PROFILE_RING_TEXT": {
       return { ...state, profileRingText: action.payload };
     }
@@ -81,6 +84,9 @@ const profileRingReducer = (
     }
     case "CHANGE_PROFILE_RING_FADE_COLOR": {
       return { ...state, profileRingFadeColor: action.payload };
+    }
+    case "CHANGE_PROFILE_RING_FONT_FAMILY": {
+      return { ...state, profileRingFontFamily: action.payload };
     }
     default:
       return state;
@@ -160,6 +166,7 @@ const Home: NextPage = () => {
       profileRingTextStartOffset,
       profileRingColor,
       profileRingFadeColor,
+      profileRingFontFamily,
     },
     profileRingDispatch,
   ] = useReducer(profileRingReducer, {
@@ -169,6 +176,7 @@ const Home: NextPage = () => {
     profileRingTextStartOffset: 2,
     profileRingColor: "#54873C",
     profileRingFadeColor: "#000000",
+    profileRingFontFamily: "'Inter', sans-serif",
   });
 
   const downloadLinkRef = useRef<HTMLAnchorElement>(null);
@@ -300,205 +308,243 @@ const Home: NextPage = () => {
 
   const profilePicWidth = profilePicDimensions.width;
   const profilePicHeight = profilePicDimensions.height;
-  const profileRingOffset = profilePicWidth / 2 - 26.25;
   const isDownloading = downloadStatusState.pending;
 
+  const onProfilePicLoad = (ref: HTMLImageElement) => {
+    setProfilePicDimensions({
+      width: ref.width,
+      height: ref.height,
+    });
+  };
+
   return (
-    <>
-      <header className="flex bg-gray-800">
-        <h1 className="text-gray-300 bg-gray-900 bg-opacity-60 text-center text-3xl py-2 mt-2 w-11/12 mx-auto rounded-2xl relative container max-w-md">Prings</h1>
-      </header>
-      <main
-        className="min-h-screen py-6 px-10 bg-gray-800"
-      >
-        <section className="relative container flex max-w-md mx-auto flex-col items-center justify-center">
+    <div className="min-h-screen bg-zinc-900">
+      <main className="container sm:py-8 px-0 sm:px-4">
+        <div className="skeuo-card mx-0 sm:mx-auto sm:max-w-md w-full">
 
-          <img
-            ref={profilePicRef}
-            src={profilePicUrl}
-            className="rounded-full aspect-square w-80 h-80 object-cover"
-            style={{ minWidth: '20rem' }}
-          />
+          <div className="space-y-6">
+            <div className="flex justify-center">
+              <ProfileRing
+                profilePicUrl={profilePicUrl}
+                profilePicWidth={profilePicWidth}
+                profilePicHeight={profilePicHeight}
+                profileRingText={profileRingText}
+                profileRingTextColor={profileRingTextColor}
+                profileRingTextFontSize={profileRingTextFontSize}
+                profileRingTextStartOffset={profileRingTextStartOffset}
+                profileRingColor={profileRingColor}
+                profileRingFadeColor={profileRingFadeColor}
+                profileRingFontFamily={profileRingFontFamily}
+                onProfilePicLoad={onProfilePicLoad}
+                profileRingSVGRef={profileRingSVGRef}
+                profilePicRef={profilePicRef}
+              />
+            </div>
 
-          <svg
-            ref={profileRingSVGRef}
-            width={profilePicWidth}
-            height={profilePicHeight}
-            className={clsx("absolute top-0", profilePicWidth ? 'visible' : 'invisible')}
-            xmlns="http://www.w3.org/2000/svg"
-            xmlnsXlink="http://www.w3.org/1999/xlink"
-            fontSize={`${profileRingTextFontSize}rem`}
-          >
-            <defs>
-              <linearGradient
-                id="profileRingGradient"
-                x1="195"
-                y1="260"
-                x2="234"
-                y2="197"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stopColor={profileRingColor} />
-                <stop
-                  offset="1"
-                  stopColor={profileRingFadeColor}
-                  stopOpacity="0"
-                />
-              </linearGradient>
-            </defs>
-
-            <path
-              d={`M ${profilePicWidth / 2} ${profilePicWidth / 2}
-    m -${profileRingOffset}, 0
-    a ${profileRingOffset},${profileRingOffset} 0 1,0 ${profileRingOffset * 2},0
-    a ${profileRingOffset},${profileRingOffset} 0 1,0 -${profileRingOffset * 2
-                },0`}
-              id="profileRingTextPath"
-              fill="none"
-              stroke="url(#profileRingGradient)"
-              strokeWidth="52.5"
-            />
-            <text dy="0.3em" fontSize="1em">
-              <textPath
-                style={{
-                  lineHeight: "2.5rem",
-                  fontWeight: "700",
-                  fill: profileRingTextColor,
-                  letterSpacing: "2.4px",
-                  fontFamily: "sans-serif",
-                }}
-                xlinkHref="#profileRingTextPath"
-                startOffset={`${profileRingTextStartOffset}%`}
-              >
-                {profileRingText}
-              </textPath>
-            </text>
-          </svg>
-          <input
-            className="my-2 w-full"
-            type="file"
-            accept="image/*"
-            onChange={onProfilePicUpload}
-          />
-          <input
-            className="my-2 px-4 py-2.5 bg-transparent border-4 font-semibold text-gray-400 border-gray-600 w-full rounded-2xl"
-            value={profileRingText}
-            placeholder="Enter Profile Ring Text..."
-            onChange={onProfileRingTextChange}
-          />
-          <div className="flex justify-between my-2 w-full">
-            <div className="w-full">
-              <p className="font-semibold text-gray-200 mb-1">Change color of</p>
-              <div className="flex justify-between">
-                <div className="flex flex-wrap gap-1">
-                  <label className="flex items-center bg-gray-700 px-2 sm:px-4 rounded-full">
-                    {" "}
-                    <span className="mx-1 text-sm text-green-300 font-semibold">Ring</span>{" "}
-                    <input
-                      type="radio"
-                      name="profileRingColors"
-                      value="profileRingColor"
-                      checked={selectedColorOption.ring}
-                      onChange={() => selectedColorDispatch({ type: "RING" })}
-                    />
-                  </label>
-                  <label className="flex items-center bg-gray-700 px-2 sm:px-4 rounded-full">
-                    <span className="mx-1 text-sm text-green-300 font-semibold">Fade</span>
-                    <input
-                      type="radio"
-                      name="profileRingColors"
-                      value="profileRingFadeColor"
-                      checked={selectedColorOption.fade}
-                      onChange={() => selectedColorDispatch({ type: "FADE" })}
-                    />
-                  </label>
-                  <label className="flex items-center bg-gray-700 px-2 sm:px-4 rounded-full">
-                    <span className="mx-1 text-sm text-green-300 font-semibold">Text</span>
-                    <input
-                      type="radio"
-                      name="profileRingColors"
-                      value="profileRingTextColor"
-                      checked={selectedColorOption.text}
-                      onChange={() => selectedColorDispatch({ type: "TEXT" })}
-                    />
-                  </label>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="profile-pic" className="block mb-2 font-semibold text-zinc-200" style={{ textShadow: "0 1px 0 rgba(0, 0, 0, 0.8)" }}>Upload Profile Picture</Label>
+                <div className="p-0 overflow-hidden transition-all">
+                  <Input
+                    id="profile-pic"
+                    type="file"
+                    accept="image/*"
+                    onChange={onProfilePicUpload}
+                    className="p-0 cursor-pointer border-0 shadow-none bg-transparent text-zinc-200 focus-visible:outline-none focus-visible:ring-0"
+                  />
                 </div>
-                <Popover.Root>
-                  <Popover.Trigger className="p-4 rounded-lg border-white border-2" style={{
-                    backgroundColor: selectedColorOption.ring
-                      ? profileRingColor
-                      : selectedColorOption.fade
-                        ? profileRingFadeColor
-                        : profileRingTextColor,
-                  }}>
-                  </Popover.Trigger>
-                  <Popover.Content>
-                    <HexColorPicker
-                      color={profileRingFadeColor}
-                      onChange={onChangeColors}
-                    />
-                    ;
-                  </Popover.Content>
-                </Popover.Root>
               </div>
+
+              <div>
+                <Label htmlFor="ring-text" className="block mb-1 sm:mb-2 font-semibold text-zinc-200" style={{ textShadow: "0 1px 0 rgba(0, 0, 0, 0.8)" }}>Ring Text</Label>
+                <Input
+                  id="ring-text"
+                  type="text"
+                  className="skeuo-input"
+                  value={profileRingText}
+                  onChange={onProfileRingTextChange}
+                  placeholder="Enter text for the ring"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="font-family" className="block mb-1 sm:mb-2 font-semibold text-zinc-200" style={{ textShadow: "0 1px 0 rgba(0, 0, 0, 0.8)" }}>Font Style</Label>
+                <select
+                  id="font-family"
+                  className="skeuo-input w-full h-10 px-3 py-2 rounded-md"
+                  value={profileRingFontFamily}
+                  onChange={(e) => profileRingDispatch({
+                    type: "CHANGE_PROFILE_RING_FONT_FAMILY",
+                    payload: e.target.value,
+                  })}
+                >
+                  <option value="'Inter', sans-serif">Inter</option>
+                  <option value="'Roboto', sans-serif">Roboto</option>
+                  <option value="'Open Sans', sans-serif">Open Sans</option>
+                  <option value="'Montserrat', sans-serif">Montserrat</option>
+                  <option value="Arial, sans-serif">Arial</option>
+                  <option value="'Times New Roman', serif">Times New Roman</option>
+                  <option value="'Courier New', monospace">Courier New</option>
+                  <option value="Georgia, serif">Georgia</option>
+                  <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                  <option value="Verdana, sans-serif">Verdana</option>
+                  <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+                  <option value="Impact, sans-serif">Impact</option>
+                  <option value="'Lucida Console', monospace">Lucida Console</option>
+                  <option value="'Palatino Linotype', serif">Palatino Linotype</option>
+                </select>
+              </div>
+
+              <div>
+                <Label className="block mb-2 font-semibold text-zinc-200" style={{ textShadow: "0 1px 0 rgba(0, 0, 0, 0.8)" }}>Color Selection</Label>
+                <div className="flex items-center justify-between mt-2 p-4 rounded-lg bg-zinc-800 border border-zinc-900 shadow-sm">
+                  <div className="flex space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="ring"
+                        name="colorOption"
+                        className="skeuo-radio"
+                        checked={selectedColorOption.ring}
+                        onChange={() => selectedColorDispatch({ type: "RING" })}
+                      />
+                      <Label htmlFor="ring" className="font-medium text-zinc-200" style={{ textShadow: "0 1px 0 rgba(0, 0, 0, 0.8)" }}>Ring</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="fade"
+                        name="colorOption"
+                        className="skeuo-radio"
+                        checked={selectedColorOption.fade}
+                        onChange={() => selectedColorDispatch({ type: "FADE" })}
+                      />
+                      <Label htmlFor="fade" className="font-medium text-zinc-200" style={{ textShadow: "0 1px 0 rgba(0, 0, 0, 0.8)" }}>Fade</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="text"
+                        name="colorOption"
+                        className="skeuo-radio"
+                        checked={selectedColorOption.text}
+                        onChange={() => selectedColorDispatch({ type: "TEXT" })}
+                      />
+                      <Label htmlFor="text" className="font-medium text-zinc-200" style={{ textShadow: "0 1px 0 rgba(0, 0, 0, 0.8)" }}>Text</Label>
+                    </div>
+                  </div>
+
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button
+                        className="w-10 h-10 rounded-md border border-zinc-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-900 transition-shadow"
+                        style={{
+                          backgroundColor: selectedColorOption.ring
+                            ? profileRingColor
+                            : selectedColorOption.fade
+                              ? profileRingFadeColor
+                              : profileRingTextColor,
+                          boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3)"
+                        }}
+                        onFocus={(e) => {
+                          e.currentTarget.setAttribute('data-focused', 'true');
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.removeAttribute('data-focused');
+                        }}
+                      />
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-3 shadow-lg border border-zinc-900 bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-900">
+                      <HexColorPicker
+                        color={
+                          selectedColorOption.ring
+                            ? profileRingColor
+                            : selectedColorOption.fade
+                              ? profileRingFadeColor
+                              : profileRingTextColor
+                        }
+                        onChange={onChangeColors}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between mb-2">
+                  <Label htmlFor="text-size" className="font-semibold text-zinc-200" style={{ textShadow: "0 1px 0 rgba(0, 0, 0, 0.8)" }}>Text Size</Label>
+                </div>
+                <div className="px-1 py-3">
+                  <div className="skeuo-slider-track relative">
+                    <div
+                      className="skeuo-slider-range absolute h-full rounded-full"
+                      style={{ width: `${((profileRingTextFontSize - 1) / 2) * 100}%` }}
+                    ></div>
+                    <Slider
+                      id="text-size"
+                      value={[profileRingTextFontSize]}
+                      min={1}
+                      max={3}
+                      step={0.1}
+                      onValueChange={(value: number[]) =>
+                        profileRingDispatch({
+                          type: "CHANGE_PROFILE_RING_TEXT_FONT_SIZE",
+                          payload: value[0],
+                        })
+                      }
+                      disabled={!profileRingText}
+                      className="relative z-10"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between mb-2">
+                  <Label htmlFor="text-position" className="font-semibold text-zinc-200" style={{ textShadow: "0 1px 0 rgba(0, 0, 0, 0.8)" }}>Text Position</Label>
+                </div>
+                <div className="px-1 py-3">
+                  <div className="skeuo-slider-track relative">
+                    <div
+                      className="skeuo-slider-range absolute h-full rounded-full"
+                      style={{ width: `${profileRingTextStartOffset}%` }}
+                    ></div>
+                    <Slider
+                      id="text-position"
+                      value={[profileRingTextStartOffset]}
+                      min={0}
+                      max={100}
+                      step={1}
+                      onValueChange={(value: number[]) =>
+                        profileRingDispatch({
+                          type: "CHANGE_PROFILE_RING_TEXT_START_OFFSET",
+                          payload: value[0],
+                        })
+                      }
+                      disabled={!profileRingText}
+                      className="relative z-10"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <button
+                className={cn(
+                  "skeuo-button w-full py-3 px-4 mt-4 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-900",
+                  !profileRingText || isDownloading ? "opacity-50 cursor-not-allowed" : ""
+                )}
+                disabled={!profileRingText || isDownloading}
+                onClick={onDownloadProfilePic}
+              >
+                {!isDownloading ? 'Download' : 'Processing...'}
+              </button>
             </div>
           </div>
-          <div className="w-full mt-2">
-            <label className="font-semibold text-gray-200">Change text size</label>
-            <Slider.Root
-              className="relative flex items-center w-full h-4 touch-none select-none"
-              value={[profileRingTextFontSize]}
-              min={1}
-              max={3}
-              step={0.1}
-              onValueChange={(value: number[]) =>
-                profileRingDispatch({
-                  type: "CHANGE_PROFILE_RING_TEXT_FONT_SIZE",
-                  payload: value,
-                })
-              }
-              disabled={!profileRingText}
-            >
-              <Slider.Track className="relative bg-gray-700 flex-grow rounded-full h-2">
-                <Slider.Range className="absolute bg-green-300 rounded-full h-full" />
-              </Slider.Track>
-              <Slider.Thumb className="w-6 h-6 bg-red-400 rounded-full block" />
-            </Slider.Root>
-          </div>
-          <div className="mt-2 w-full">
-            <label className="font-semibold text-gray-200">Change text position</label>
-            <Slider.Root
-              className="relative flex items-center w-full h-4 touch-none select-none"
-              value={[profileRingTextStartOffset]}
-              min={0}
-              max={100}
-              step={1}
-              onValueChange={(value: number[]) =>
-                profileRingDispatch({
-                  type: "CHANGE_PROFILE_RING_TEXT_START_OFFSET",
-                  payload: value,
-                })
-              }
-              disabled={!profileRingText}
-            >
-              <Slider.Track className="relative bg-gray-700 flex-grow rounded-full h-2">
-                <Slider.Range className="absolute bg-green-300 rounded-full h-full" />
-              </Slider.Track>
-              <Slider.Thumb className="w-6 h-6 bg-red-400 rounded-full block" />
-            </Slider.Root>
-          </div>
-          <button
-            className={clsx("px-4 py-2 mt-4 w-9/12 bg-gray-700 bg-opacity-70 text-green-300 font-semibold rounded-full disabled:bg-gray-400 disabled:text-gray-200", isDownloading && "animate-pulse")}
-            disabled={!profileRingText || isDownloading}
-            onClick={onDownloadProfilePic}
-          >
-            {!isDownloading ? 'Download' : '◉  ◉  ◉'}
-          </button>
-          <a hidden target='_blank' ref={downloadLinkRef} />
-        </section>
-        <canvas hidden ref={canvasRef} />
+        </div>
       </main>
-    </>
+      <a hidden target='_blank' ref={downloadLinkRef} />
+      <canvas hidden ref={canvasRef} />
+    </div>
   );
 };
 
