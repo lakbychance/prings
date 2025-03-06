@@ -1,10 +1,8 @@
 import React from 'react';
-import { cn } from '../lib/utils';
+import { motion } from 'framer-motion';
 
 interface ProfileRingProps {
     profilePicUrl: string;
-    profilePicWidth: number;
-    profilePicHeight: number;
     profileRingText: string;
     profileRingTextColor: string;
     profileRingTextFontSize: number;
@@ -12,15 +10,12 @@ interface ProfileRingProps {
     profileRingColor: string;
     profileRingFadeColor: string;
     profileRingFontFamily: string;
-    onProfilePicLoad: (ref: HTMLImageElement) => void;
     profileRingSVGRef: React.RefObject<SVGSVGElement>;
     profilePicRef: React.RefObject<HTMLImageElement>;
 }
 
 export function ProfileRing({
     profilePicUrl,
-    profilePicWidth,
-    profilePicHeight,
     profileRingText,
     profileRingTextColor,
     profileRingTextFontSize,
@@ -28,35 +23,41 @@ export function ProfileRing({
     profileRingColor,
     profileRingFadeColor,
     profileRingFontFamily,
-    onProfilePicLoad,
     profileRingSVGRef,
     profilePicRef,
 }: ProfileRingProps) {
-    const profileRingOffset = profilePicWidth / 2 - 26.25;
+    // Fixed size for both the container and SVG
+    const FIXED_SIZE = 320; // 20rem = 320px (w-80 h-80)
+    const profileRingOffset = FIXED_SIZE / 2 - 26.25;
 
     return (
-        <div className="relative flex items-center justify-center">
+        <div
+            className="relative"
+            style={{
+                width: `${FIXED_SIZE}px`,
+                height: `${FIXED_SIZE}px`
+            }}
+        >
             <img
                 ref={profilePicRef}
                 src={profilePicUrl}
-                className="rounded-full aspect-square w-80 h-80 object-cover"
-                style={{ minWidth: '20rem', objectFit: 'cover' }}
+                className="rounded-full absolute inset-0 w-full h-full object-cover"
                 alt="Profile"
-                onLoad={() => {
-                    if (profilePicRef.current) {
-                        onProfilePicLoad(profilePicRef.current);
-                    }
-                }}
             />
 
-            <svg
+            <motion.svg
+                initial={{ opacity: 0, filter: 'blur(4px)' }}
+                animate={{ opacity: 1, filter: 'blur(0px)' }}
+                transition={{ duration: 0.5 }}
                 ref={profileRingSVGRef}
-                width={profilePicWidth}
-                height={profilePicHeight}
-                className={cn("absolute top-0", profilePicWidth ? 'visible' : 'invisible')}
+                width={FIXED_SIZE}
+                height={FIXED_SIZE}
+                className="absolute inset-0"
                 xmlns="http://www.w3.org/2000/svg"
                 xmlnsXlink="http://www.w3.org/1999/xlink"
                 fontSize={`${profileRingTextFontSize}rem`}
+                viewBox={`0 0 ${FIXED_SIZE} ${FIXED_SIZE}`}
+                preserveAspectRatio="xMidYMid meet"
             >
                 <defs>
                     <linearGradient
@@ -77,7 +78,7 @@ export function ProfileRing({
                 </defs>
 
                 <path
-                    d={`M ${profilePicWidth / 2} ${profilePicWidth / 2}
+                    d={`M ${FIXED_SIZE / 2} ${FIXED_SIZE / 2}
 m -${profileRingOffset}, 0
 a ${profileRingOffset},${profileRingOffset} 0 1,0 ${profileRingOffset * 2},0
 a ${profileRingOffset},${profileRingOffset} 0 1,0 -${profileRingOffset * 2},0`}
@@ -101,7 +102,7 @@ a ${profileRingOffset},${profileRingOffset} 0 1,0 -${profileRingOffset * 2},0`}
                         {profileRingText}
                     </textPath>
                 </text>
-            </svg>
+            </motion.svg>
         </div>
     );
 } 

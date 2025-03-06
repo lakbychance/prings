@@ -347,16 +347,7 @@ const Home: NextPage = () => {
     return () => window.removeEventListener("resize", onWindowResize);
   }, []);
 
-  const profilePicWidth = profilePicDimensions.width;
-  const profilePicHeight = profilePicDimensions.height;
   const isDownloading = downloadStatusState.pending;
-
-  const onProfilePicLoad = (ref: HTMLImageElement) => {
-    setProfilePicDimensions({
-      width: ref.width,
-      height: ref.height,
-    });
-  };
 
   return (
     <div className="min-h-screen bg-zinc-900 text-zinc-100">
@@ -373,8 +364,6 @@ const Home: NextPage = () => {
                 )}
                 <ProfileRing
                   profilePicUrl={profilePicUrl}
-                  profilePicWidth={profilePicWidth}
-                  profilePicHeight={profilePicHeight}
                   profileRingText={profileRingText}
                   profileRingTextColor={profileRingTextColor}
                   profileRingTextFontSize={profileRingTextFontSize}
@@ -382,7 +371,6 @@ const Home: NextPage = () => {
                   profileRingColor={profileRingColor}
                   profileRingFadeColor={profileRingFadeColor}
                   profileRingFontFamily={profileRingFontFamily}
-                  onProfilePicLoad={onProfilePicLoad}
                   profileRingSVGRef={profileRingSVGRef}
                   profilePicRef={profilePicRef}
                 />
