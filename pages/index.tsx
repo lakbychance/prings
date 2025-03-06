@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import { ChangeEvent, useEffect, useReducer, useRef, useState } from "react";
+import { Pipette } from 'lucide-react'
 import { HexColorPicker } from "react-colorful";
 import { Input } from "../components/ui/input";
 import { Slider } from "../components/ui/slider";
@@ -8,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popove
 import { ProfileRing } from "../components/ProfileRing";
 import ImageCropper from "../components/ImageCropper";
 import { cn } from "../lib/utils";
+import { useMedia } from 'react-use';
 
 function fit(contains: boolean) {
   return (
@@ -149,6 +151,8 @@ const Home: NextPage = () => {
   const [showCropper, setShowCropper] = useState<boolean>(false);
   const [imageToEdit, setImageToEdit] = useState<string | null>(null);
   const [isImageLoading, setIsImageLoading] = useState<boolean>(false);
+  const [isImageColorPickerMode, setIsImageColorPickerMode] = useState<boolean>(false);
+  const isMobileDevice = useMedia('(max-width: 768px)');
 
   const [selectedColorOption, selectedColorDispatch] = useReducer(
     selectedColorOptionReducer,
@@ -187,6 +191,12 @@ const Home: NextPage = () => {
   const profilePicRef = useRef<HTMLImageElement>(null);
   const profileRingSVGRef = useRef<SVGSVGElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imageColorPickerCanvasRef = useRef<HTMLCanvasElement>(null);
+  const profilePicContainerRef = useRef<HTMLDivElement>(null);
+  const colorPreviewRef = useRef<HTMLDivElement>(null);
+  const colorSwatchRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const lastPositionRef = useRef<{ x: number; y: number } | null>(null);
 
   const onProfilePicUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = e.target?.files?.[0];
@@ -325,14 +335,182 @@ const Home: NextPage = () => {
     });
   };
 
-  useEffect(() => {
-    if (profilePicRef.current) {
-      setProfilePicDimensions({
-        width: profilePicRef.current.width,
-        height: profilePicRef.current.height,
-      });
+  const getColorAtPosition = (x: number, y: number): string => {
+    const canvas = imageColorPickerCanvasRef.current;
+    if (!canvas) return '#000000';
+
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) return '#000000';
+
+    const pixelData = ctx.getImageData(x, y, 1, 1).data;
+    // Ensure each color component is properly padded with leading zeros
+    const r = pixelData[0].toString(16).padStart(2, '0');
+    const g = pixelData[1].toString(16).padStart(2, '0');
+    const b = pixelData[2].toString(16).padStart(2, '0');
+    return `#${r}${g}${b}`;
+  };
+
+  const updateColorPreview = (x: number, y: number) => {
+    const container = profilePicContainerRef.current;
+    const preview = colorPreviewRef.current;
+    const swatch = colorSwatchRef.current;
+
+    if (!container || !preview || !swatch) return;
+
+    const rect = container.getBoundingClientRect();
+
+    // Check if the point is within the circular area
+    // The profile picture is a circle in the center of the container
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const radius = rect.width / 2; // For a perfect circle, radius is exactly half the width
+
+    // Calculate distance from center in screen coordinates
+    const distanceFromCenter = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+
+    // If outside the circle, hide the preview and return
+    if (distanceFromCenter > radius) {
+      preview.style.display = 'none';
+      return;
     }
-  }, [profilePicRef.current]);
+
+    // Calculate the position relative to the canvas
+    const canvas = imageColorPickerCanvasRef.current;
+    if (!canvas) return;
+
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+
+    // Since canvas now matches the display dimensions, the scaling is 1:1
+    const canvasX = Math.floor(x);
+    const canvasY = Math.floor(y);
+
+    if (canvasX >= 0 && canvasX < canvasWidth && canvasY >= 0 && canvasY < canvasHeight) {
+      const color = getColorAtPosition(canvasX, canvasY);
+
+      // Update the preview directly using the refs
+      preview.style.display = 'flex';
+      preview.style.left = `${x + 15}px`;
+      preview.style.top = `${y + 15}px`;
+
+      swatch.style.backgroundColor = color;
+    }
+  };
+
+  const handleImageColorPickerMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isImageColorPickerMode || isMobileDevice) return;
+
+    const container = profilePicContainerRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Store the position for use in the animation frame
+    lastPositionRef.current = { x, y };
+
+    // Cancel any existing animation frame
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+    }
+
+    // Schedule the update on the next animation frame
+    rafRef.current = requestAnimationFrame(() => {
+      if (lastPositionRef.current) {
+        updateColorPreview(lastPositionRef.current.x, lastPositionRef.current.y);
+      }
+      rafRef.current = null;
+    });
+  };
+
+  const handleImageColorPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isImageColorPickerMode) return;
+
+    // Cancel any pending animation frame
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+
+    const container = profilePicContainerRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Check if the point is within the circular area
+    // The profile picture is a circle in the center of the container
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const radius = rect.width / 2; // For a perfect circle, radius is exactly half the width
+
+    // Calculate distance from center in screen coordinates
+    const distanceFromCenter = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+    // If outside the circle, do nothing
+    if (distanceFromCenter > radius) {
+      return;
+    }
+
+    // Calculate the position relative to the canvas
+    const canvas = imageColorPickerCanvasRef.current;
+    if (!canvas) return;
+
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+
+    // Since canvas now matches the display dimensions, the scaling is 1:1
+    const canvasX = Math.floor(x);
+    const canvasY = Math.floor(y);
+
+    if (canvasX >= 0 && canvasX < canvasWidth && canvasY >= 0 && canvasY < canvasHeight) {
+      const color = getColorAtPosition(canvasX, canvasY);
+
+      // Apply the selected color
+      onChangeColors(color);
+      setIsImageColorPickerMode(false);
+
+      // Hide the preview
+      if (colorPreviewRef.current) {
+        colorPreviewRef.current.style.display = 'none';
+      }
+
+      // Reset position ref
+      lastPositionRef.current = null;
+    }
+  };
+
+  // Setup the canvas for color picking when the mode is enabled
+  useEffect(() => {
+    if (isImageColorPickerMode && profilePicRef.current) {
+      const canvas = imageColorPickerCanvasRef.current;
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      if (!ctx) return;
+
+      const img = profilePicRef.current;
+      // Set canvas dimensions to match the DISPLAY dimensions of the image
+      // This ensures the coordinate systems are consistent
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      // Draw the image to the canvas, scaling it to fit the canvas dimensions
+      ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, canvas.width, canvas.height);
+    }
+  }, [isImageColorPickerMode, isMobileDevice]);
+
+  // Toggle image color picker mode
+  const toggleImageColorPickerMode = () => {
+    setIsImageColorPickerMode(!isImageColorPickerMode);
+    if (!isImageColorPickerMode) {
+      // Reset hover state when enabling
+      if (colorPreviewRef.current) {
+        colorPreviewRef.current.style.display = 'none';
+      }
+    }
+  };
 
   useEffect(() => {
     const onWindowResize = () => {
@@ -347,6 +525,7 @@ const Home: NextPage = () => {
     return () => window.removeEventListener("resize", onWindowResize);
   }, []);
 
+
   const isDownloading = downloadStatusState.pending;
 
   return (
@@ -356,10 +535,35 @@ const Home: NextPage = () => {
 
           <div className="space-y-6">
             <div className="flex justify-center">
-              <div className="relative">
+              <div
+                className="relative"
+                ref={profilePicContainerRef}
+                onMouseMove={handleImageColorPickerMouseMove}
+                onClick={handleImageColorPickerClick}
+                onMouseLeave={() => {
+                  if (colorPreviewRef.current) {
+                    colorPreviewRef.current.style.display = 'none';
+                  }
+                  // Cancel any pending animation frame
+                  if (rafRef.current !== null) {
+                    cancelAnimationFrame(rafRef.current);
+                    rafRef.current = null;
+                  }
+                  lastPositionRef.current = null;
+                }}
+
+                style={{ cursor: isImageColorPickerMode ? 'crosshair' : 'default' }}
+              >
                 {isImageLoading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-zinc-900 bg-opacity-50 rounded-full z-10">
                     <div className="w-12 h-12 border-4 border-zinc-600 border-t-zinc-300 rounded-full animate-spin"></div>
+                  </div>
+                )}
+                {isImageColorPickerMode && (
+                  <div className="absolute inset-0 rounded-full border-4 border-green-500 z-10 pointer-events-none">
+                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                      {isMobileDevice ? "Tap to pick a color" : "Click to pick a color"}
+                    </div>
                   </div>
                 )}
                 <ProfileRing
@@ -374,6 +578,31 @@ const Home: NextPage = () => {
                   profileRingSVGRef={profileRingSVGRef}
                   profilePicRef={profilePicRef}
                 />
+
+                <div
+                  ref={colorPreviewRef}
+                  style={{
+                    position: 'absolute',
+                    display: 'none',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    zIndex: 1000,
+                    pointerEvents: 'none'
+                  }}
+                >
+                  <div className="flex flex-col items-center">
+                    <div
+                      ref={colorSwatchRef}
+                      style={{
+                        width: '30px',
+                        height: '30px',
+                        borderRadius: '50%',
+                        border: '2px solid white',
+                        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -476,39 +705,54 @@ const Home: NextPage = () => {
                     </div>
                   </div>
 
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button
-                        className="w-10 h-10 rounded-md border border-zinc-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-900 transition-shadow"
-                        style={{
-                          backgroundColor: selectedColorOption.ring
-                            ? profileRingColor
-                            : selectedColorOption.fade
-                              ? profileRingFadeColor
-                              : profileRingTextColor,
-                          boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3)"
-                        }}
-                        onFocus={(e) => {
-                          e.currentTarget.setAttribute('data-focused', 'true');
-                        }}
-                        onBlur={(e) => {
-                          e.currentTarget.removeAttribute('data-focused');
-                        }}
-                      />
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-3 shadow-lg border border-zinc-900 bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-900">
-                      <HexColorPicker
-                        color={
-                          selectedColorOption.ring
-                            ? profileRingColor
-                            : selectedColorOption.fade
-                              ? profileRingFadeColor
-                              : profileRingTextColor
-                        }
-                        onChange={onChangeColors}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      className={cn(
+                        "color-picker-button w-10 h-10 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-900",
+                      )}
+                      onClick={toggleImageColorPickerMode}
+                      title={isImageColorPickerMode ? "Cancel color picking" : "Pick color from image"}
+                    >
+                      <Pipette className={cn(
+                        "w-6 h-6 mx-auto",
+                        isImageColorPickerMode && "text-green-500"
+                      )} />
+                    </button>
+
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button
+                          className="w-10 h-10 rounded-md border border-zinc-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-900 transition-shadow"
+                          style={{
+                            backgroundColor: selectedColorOption.ring
+                              ? profileRingColor
+                              : selectedColorOption.fade
+                                ? profileRingFadeColor
+                                : profileRingTextColor,
+                            boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3)"
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.setAttribute('data-focused', 'true');
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.removeAttribute('data-focused');
+                          }}
+                        />
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-3 shadow-lg border border-zinc-900 bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-900">
+                        <HexColorPicker
+                          color={
+                            selectedColorOption.ring
+                              ? profileRingColor
+                              : selectedColorOption.fade
+                                ? profileRingFadeColor
+                                : profileRingTextColor
+                          }
+                          onChange={onChangeColors}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
               </div>
 
@@ -586,6 +830,7 @@ const Home: NextPage = () => {
       </main>
       <a hidden target='_blank' ref={downloadLinkRef} />
       <canvas hidden ref={canvasRef} />
+      <canvas hidden ref={imageColorPickerCanvasRef} />
 
       {imageToEdit && (
         <ImageCropper
