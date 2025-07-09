@@ -1,1 +1,1 @@
-Generate Linkedin style profile rings for your images ✨
+Generate Linkedin frames for your profile pictures ✨
