@@ -74,7 +74,7 @@ const Document = () => {
                 <meta name="twitter:creator" content="@lakbychance" />
 
                 {/* Others */}
-                <meta name="keywords" content="Linkedin, Profile Ring, Prings, Frames, Profile Picture, Profile Picture Frames, LinkedIn Frames, LinkedIn Profile Picture Frames, Linkedin image hashtag creator" />
+                <meta name="keywords" content="Linkedin, Profile Ring, LinkedIn Frames, Linkedin frame generator, LinkedIn Profile Picture Frames, Linkedin image hashtag creator" />
                 <meta name="author" content="Lakshya Thakur" />
             </Head>
             <body>
