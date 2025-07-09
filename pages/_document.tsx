@@ -41,14 +41,14 @@ const Document = () => {
                 <meta name="msapplication-TileColor" content="	#00800" />
                 <meta name="theme-color" content="	#00800" />
 
-                <meta name="title" content="Prings" />
-                <meta name="description" content="Add LinkedIn style profile rings to your images" />
+                <meta name="title" content="Prings - LinkedIn frame generator" />
+                <meta name="description" content="Add LinkedIn frames to your profile picture, customize the text, colors, and more" />
 
                 {/*<!-- Open Graph / Facebook -->*/}
-                <meta property="og:title" content="Prings" />
+                <meta property="og:title" content="Prings - LinkedIn frame generator" />
                 <meta
                     property="og:description"
-                    content="Add LinkedIn style profile rings to your images"
+                    content="Add LinkedIn frames to your profile picture, customize the text, colors, and more"
                 />
                 <meta property="og:url" content="https://prings.vercel.app" />
                 <meta property="og:type" content="website" />
@@ -60,10 +60,10 @@ const Document = () => {
                 {/* <!-- Twitter -->*/}
                 <meta property="twitter:card" content="summary_large_image" />
                 <meta property="twitter:url" content="https://prings.vercel.app" />
-                <meta property="twitter:title" content="Prings" />
+                <meta property="twitter:title" content="Prings - LinkedIn frame generator" />
                 <meta
                     property="twitter:description"
-                    content="Add LinkedIn style profile rings to your images"
+                    content="Add LinkedIn frames to your profile picture, customize the text, colors, and more"
                 />
                 <meta
                     property="twitter:image"
@@ -73,7 +73,7 @@ const Document = () => {
                 <meta name="twitter:creator" content="@lakbychance" />
 
                 {/* Others */}
-                <meta name="keywords" content="Linkedin, Profile Ring, Prings" />
+                <meta name="keywords" content="Linkedin, Profile Ring, Prings, Frames, Profile Picture, Profile Picture Frames, LinkedIn Frames, LinkedIn Profile Picture Frames, Linkedin image hashtag creator" />
                 <meta name="author" content="Lakshya Thakur" />
             </Head>
             <body>
