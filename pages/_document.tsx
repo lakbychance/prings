@@ -56,6 +56,7 @@ const Document = () => {
                     property="og:image"
                     content="https://ik.imagekit.io/lapstjup/prings/prings_og_image.png"
                 />
+                <link rel="canonical" href="https://prings.vercel.app" />
 
                 {/* <!-- Twitter -->*/}
                 <meta property="twitter:card" content="summary_large_image" />
