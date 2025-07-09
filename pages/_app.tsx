@@ -6,7 +6,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Prings</title>
+        <title>Prings - LinkedIn frame generator</title>
       </Head>
       <Component {...pageProps} />
     </>)
