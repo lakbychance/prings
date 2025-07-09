@@ -58,6 +58,8 @@ const Document = () => {
                 />
                 <link rel="canonical" href="https://prings.vercel.app" />
 
+                <meta name="robots" content="index, follow" />
+
                 {/* <!-- Twitter -->*/}
                 <meta property="twitter:card" content="summary_large_image" />
                 <meta property="twitter:url" content="https://prings.vercel.app" />
